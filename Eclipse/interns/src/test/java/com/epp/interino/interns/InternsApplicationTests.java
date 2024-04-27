@@ -1,10 +1,10 @@
-package com.example.interino;
+package com.epp.interino.interns;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InterinoApplicationTests {
+class InternsApplicationTests {
 
 	@Test
 	void contextLoads() {
