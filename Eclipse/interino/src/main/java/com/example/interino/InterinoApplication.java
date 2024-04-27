@@ -1,13 +1,13 @@
-package com.epp.interino.interns;
+package com.example.interino;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class InternsApplication {
+public class InterinoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InternsApplication.class, args);
+		SpringApplication.run(InterinoApplication.class, args);
 	}
 
 }

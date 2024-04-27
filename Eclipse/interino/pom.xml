@@ -8,11 +8,11 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.epp.interino</groupId>
-	<artifactId>interns</artifactId>
+	<groupId>com.example</groupId>
+	<artifactId>interino</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>interns</name>
-	<description>Application to store the information of interns of a company.</description>
+	<name>interino</name>
+	<description>Aplication to control interns</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
