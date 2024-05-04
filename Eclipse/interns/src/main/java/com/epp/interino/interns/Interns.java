@@ -1,4 +1,6 @@
 package com.epp.interino.interns;
 
-record Interns(int id, String name, String surname, double amount) {
+import org.springframework.data.annotation.Id;
+
+record Interns(@Id int id, String name, String surname, double amount) {
 }

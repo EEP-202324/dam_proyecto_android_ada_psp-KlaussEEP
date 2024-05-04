@@ -3,7 +3,10 @@ package com.epp.interino.interns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -18,7 +21,12 @@ public class InternsJsonTest {
 	@Test
 	void internsSerializationTest() throws IOException {
 		Interns interns = new Interns(1, "Pepe", "Perez", 1000.00);
-        assertThat(json.write(interns)).isStrictlyEqualToJson("expected.json");
+		
+		InputStream isTmp = InternsJsonTest.class.getClassLoader().getResourceAsStream("com/epp/interino/interns/expected.json");
+
+        String a = IOUtils.toString(isTmp, StandardCharsets.UTF_8);
+		  
+        assertThat(json.write(interns)).isStrictlyEqualToJson(a);
 
         assertThat(json.write(interns)).hasJsonPathNumberValue("@.id");
         assertThat(json.write(interns)).extractingJsonPathNumberValue("@.id")

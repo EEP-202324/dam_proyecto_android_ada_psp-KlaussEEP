@@ -35,7 +35,7 @@ class InternsApplicationTests {
         Double amount = documentContext.read("$.amount");
         assertThat(amount).isEqualTo(1000);
     }
-    
+
     @Test
     void shouldNotReturnAnInternWithAnUnknownId() {
       ResponseEntity<String> response = restTemplate.getForEntity("/interns/1000", String.class);

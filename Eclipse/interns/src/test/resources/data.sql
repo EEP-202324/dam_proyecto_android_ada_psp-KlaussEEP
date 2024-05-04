@@ -1,0 +1,1 @@
+INSERT INTO interns (ID, NAME, SURNAME, AMOUNT) VALUES (1, 'Pepe', 'Perez', 1000.00);
