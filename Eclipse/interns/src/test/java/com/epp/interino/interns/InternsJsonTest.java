@@ -16,15 +16,15 @@ import org.springframework.boot.test.json.JacksonTester;
 
 @JsonTest
 public class InternsJsonTest {
-	
+
 	@Autowired
     private JacksonTester<Interns> json;
-	
+
 	@Autowired
     private JacksonTester<Interns[]> jsonList;
-	
-	private Interns[] interns;
 
+	private Interns[] interns;
+	
     @BeforeEach
     void setUp() {
     	interns = Arrays.array(
@@ -32,7 +32,7 @@ public class InternsJsonTest {
                 new Interns(2, "Juan", "Lama", 1200.00),
                 new Interns(3, "Sancho", "Ramos", 1100.00));
     }
-	
+
 	@Test
 	void internsSerializationTest() throws IOException {
 		Interns intern = new Interns(1, "Pepe", "Perez", 1000.00);
@@ -59,12 +59,12 @@ public class InternsJsonTest {
         assertThat(json.write(intern)).extractingJsonPathNumberValue("@.amount")
              .isEqualTo(1000.00);
     }
-	
+
 	@Test
 	void internsListSerializationTest() throws IOException {
 		 assertThat(jsonList.write(interns)).isStrictlyEqualToJson("list.json");
 	}
-	
+
 	@Test
 	void internsDeserializationTest() throws IOException {
 	   String expected = """

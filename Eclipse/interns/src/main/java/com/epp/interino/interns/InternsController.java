@@ -1,8 +1,13 @@
 package com.epp.interino.interns;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +25,7 @@ public class InternsController {
 
 	private InternsController(InternsRepository internsRepository) {
 		this.internsRepository = internsRepository;
+		
 	}
 	
 	@GetMapping("/{requestedId}")
@@ -40,6 +46,17 @@ public class InternsController {
 		            .buildAndExpand(savedIntern.id())
 		            .toUri();
 		   return ResponseEntity.created(locationOfNewIntern).build();
+	}
+	
+	@GetMapping
+	private ResponseEntity<List<Interns>> findAll(Pageable pageable) {
+	    Page<Interns> page = internsRepository.findAll(
+	            PageRequest.of(
+	                    pageable.getPageNumber(),
+	                    pageable.getPageSize(),
+	                    pageable.getSortOr(Sort.by(Sort.Direction.ASC, "id"))
+	    ));
+	    return ResponseEntity.ok(page.getContent());
 	}
 	
 }
