@@ -1,6 +1,7 @@
 package com.epp.interino.interns;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +30,8 @@ public class InternsController {
 	}
 	
 	@GetMapping("/{requestedId}")
-	private ResponseEntity<Interns> findById(@PathVariable Integer requestedId) {
-		Optional<Interns> internsOptional = internsRepository.findById(requestedId);
+	private ResponseEntity<Interns> findById(@PathVariable Integer requestedId, Principal principal) {
+		Optional<Interns> internsOptional = Optional.ofNullable(internsRepository.findByIdAndBoss(requestedId, principal.getName()));
 		if (internsOptional.isPresent()) {
 			return ResponseEntity.ok(internsOptional.get());
 		}else {
@@ -49,8 +50,8 @@ public class InternsController {
 	}
 	
 	@GetMapping
-	private ResponseEntity<List<Interns>> findAll(Pageable pageable) {
-	    Page<Interns> page = internsRepository.findAll(
+	private ResponseEntity<List<Interns>> findAll(Pageable pageable, Principal principal) {
+	    Page<Interns> page = internsRepository.findByBoss(principal.getName(),
 	            PageRequest.of(
 	                    pageable.getPageNumber(),
 	                    pageable.getPageSize(),

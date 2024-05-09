@@ -2,5 +2,6 @@
 	"id":1,
 	"name":"Pepe",
 	"surname":"Perez",
-	"amount":1000.00
+	"amount":1000.00,
+	"boss":"Javier"
 }

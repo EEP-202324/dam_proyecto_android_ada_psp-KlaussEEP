@@ -1,5 +1,6 @@
 [
-	{ "id":1, "name":"Pepe", "surname":"Perez", "amount":1000.00 },
-	{ "id":2, "name":"Juan", "surname":"Lama", "amount":1200.00 },
-	{ "id":3, "name":"Sancho", "surname":"Ramos", "amount":1100.00 }
+	{ "id":1, "name":"Pepe", "surname":"Perez", "amount":1000.00, "boss":"Javier" },
+	{ "id":2, "name":"Juan", "surname":"Lama", "amount":1200.00, "boss":"Javier" },
+	{ "id":3, "name":"Sancho", "surname":"Ramos", "amount":1100.00, "boss":"Javier" },
+	{ "id":4, "name":"Alvaro", "surname":"Lasgra", "amount":1300.00, "boss":"Rosa" }
 ]
