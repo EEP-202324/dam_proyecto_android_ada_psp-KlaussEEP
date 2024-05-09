@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,22 +32,23 @@ public class InternsController {
 	
 	@GetMapping("/{requestedId}")
 	private ResponseEntity<Interns> findById(@PathVariable Integer requestedId, Principal principal) {
-		Optional<Interns> internsOptional = Optional.ofNullable(internsRepository.findByIdAndBoss(requestedId, principal.getName()));
-		if (internsOptional.isPresent()) {
-			return ResponseEntity.ok(internsOptional.get());
-		}else {
-			return ResponseEntity.notFound().build();
-		}
+		Interns intern = findIntern(requestedId, principal);
+	    if (intern != null) {
+	        return ResponseEntity.ok(intern);
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
 	}
 	
 	@PostMapping
-	private ResponseEntity<Void> createIntern(@RequestBody Interns newInternRequest, UriComponentsBuilder ucb) {
-		   Interns savedIntern = internsRepository.save(newInternRequest);
-		   URI locationOfNewIntern = ucb
-		            .path("interns/{id}")
-		            .buildAndExpand(savedIntern.id())
-		            .toUri();
-		   return ResponseEntity.created(locationOfNewIntern).build();
+	private ResponseEntity<Void> createIntern(@RequestBody Interns newInternRequest, UriComponentsBuilder ucb, Principal principal) {
+		Interns internsWithOwner = new Interns(newInternRequest.id(), newInternRequest.name(), newInternRequest.surname(), newInternRequest.amount(), principal.getName());
+	    Interns savedIntern = internsRepository.save(internsWithOwner);   
+		URI locationOfNewIntern = ucb
+			.path("interns/{id}")
+			.buildAndExpand(savedIntern.id())
+			.toUri();
+		return ResponseEntity.created(locationOfNewIntern).build();
 	}
 	
 	@GetMapping
@@ -59,6 +61,22 @@ public class InternsController {
 	    ));
 	    return ResponseEntity.ok(page.getContent());
 	}
+	
+	@PutMapping("/{requestedId}")
+	private ResponseEntity<Void> putIntern(@PathVariable Integer requestedId, @RequestBody Interns internUpdate, Principal principal) {
+		Interns intern = findIntern(requestedId, principal);
+	    if (intern != null) {
+	    	Interns updatedIntern = new Interns(intern.id(), internUpdate.name(), internUpdate.surname(), internUpdate.amount(), principal.getName());
+	        internsRepository.save(updatedIntern);
+	        return ResponseEntity.noContent().build();
+	    }
+	    return ResponseEntity.notFound().build();
+	}
+	
+	private Interns findIntern(Integer requestedId, Principal principal) {
+	    return internsRepository.findByIdAndBoss(requestedId, principal.getName());
+	}
+
 	
 }
 	

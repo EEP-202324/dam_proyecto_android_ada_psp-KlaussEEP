@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -57,7 +59,7 @@ class InternsApplicationTests {
     @Test
     @DirtiesContext
     void shouldCreateANewIntern() {
-    	   Interns newInterns = new Interns(1, "Pepe", "Perez", 1000, "Javier");
+    	   Interns newInterns = new Interns(1, "Pepe", "Perez", 1000, null);
     	   ResponseEntity<Void> createResponse = restTemplate.withBasicAuth("Javier", "j").postForEntity("/interns", newInterns, Void.class);
     	   assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -144,7 +146,7 @@ class InternsApplicationTests {
     }
     
     @Test
-    void shouldNotReturnACashCardWhenUsingBadCredentials() {
+    void shouldNotReturnAInternWhenUsingBadCredentials() {
         ResponseEntity<String> response = restTemplate
           .withBasicAuth("BAD-USER", "j")
           .getForEntity("/interns/1", String.class);
@@ -157,7 +159,7 @@ class InternsApplicationTests {
     }
     
     @Test
-    void shouldRejectUsersWhoAreNotCardOwners() {
+    void shouldRejectUsersWhoAreNotInternBosses() {
         ResponseEntity<String> response = restTemplate
           .withBasicAuth("hank-owns-no-cards", "qrs456")
           .getForEntity("/interns/1", String.class);
@@ -165,10 +167,55 @@ class InternsApplicationTests {
     }
     
     @Test
-    void shouldNotAllowAccessToCashCardsTheyDoNotOwn() {
+    void shouldNotAllowAccessToInternsTheyDoNotOwn() {
         ResponseEntity<String> response = restTemplate
           .withBasicAuth("javier", "j")
           .getForEntity("/interns/5", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+    
+	@Test
+	@DirtiesContext
+	void shouldUpdateAnExistingIntern() {
+    	Interns internsUpdate = new Interns(null, "Pepa", "Jimenez", 1400.00, null);
+    	HttpEntity<Interns> request = new HttpEntity<>(internsUpdate);
+    	ResponseEntity<Void> response = restTemplate
+    			.withBasicAuth("Javier", "j")
+                .exchange("/interns/1", HttpMethod.PUT, request, Void.class);
+    	assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+		ResponseEntity<String> getResponse = restTemplate
+				.withBasicAuth("JAVIER", "j")
+				.getForEntity("/interns/1", String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+		String name = documentContext.read("$.name");
+		String surname = documentContext.read("$.surname");
+		Double amount = documentContext.read("$.amount");
+		assertThat(id).isEqualTo(1);
+		assertThat(name).isEqualTo("Pepa");
+		assertThat(surname).isEqualTo("Jimenez");
+		assertThat(amount).isEqualTo(1400.00);
+	}
+	
+	@Test
+	void shouldNotUpdateAInternThatDoesNotExist() {
+	    Interns unknownIntern = new Interns(null,"Pepa", "Jimenez", 1400.00, null);
+	    HttpEntity<Interns> request = new HttpEntity<>(unknownIntern);
+	    ResponseEntity<Void> response = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .exchange("/interns/99999", HttpMethod.PUT, request, Void.class);
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+	
+	@Test
+	void shouldNotUpdateAInternThatIsOwnedBySomeoneElse() {
+	    Interns rosaIntern = new Interns(null,"Pepa", "Jimenez", 1400.00, null);
+	    HttpEntity<Interns> request = new HttpEntity<>(rosaIntern);
+	    ResponseEntity<Void> response = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .exchange("/interns/4", HttpMethod.PUT, request, Void.class);
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
 }
