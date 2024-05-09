@@ -48,7 +48,7 @@ public class SecurityConfig {
     		.password(passwordEncoder.encode("r"))
     		.roles("BOSS")
     		.build();
-    	return new InMemoryUserDetailsManager(javier, hankOwnsNoCards);
+    	return new InMemoryUserDetailsManager(javier, hankOwnsNoCards, rosa);
     }
     
 }

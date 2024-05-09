@@ -9,6 +9,7 @@ interface InternsRepository extends CrudRepository<Interns, Integer>,
 PagingAndSortingRepository<Interns, Integer> {  
 	Interns findByIdAndBoss(Integer id, String boss);
 	Page<Interns> findByBoss(String boss, PageRequest pageRequest);
+	boolean existsByIdAndBoss(Integer id, String boss);
 }
 
 	

@@ -218,4 +218,40 @@ class InternsApplicationTests {
 	            .exchange("/interns/4", HttpMethod.PUT, request, Void.class);
 	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
+	
+	@Test
+	@DirtiesContext
+	void shouldDeleteAnExistingIntern() {
+	    ResponseEntity<Void> response = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .exchange("/interns/1", HttpMethod.DELETE, null, Void.class);
+	    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+	    
+	    ResponseEntity<String> getResponse = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .getForEntity("/interns/1", String.class);
+	    assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+	
+	@Test
+	void shouldNotDeleteAInternThatDoesNotExist() {
+	    ResponseEntity<Void> deleteResponse = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .exchange("/interns/99999", HttpMethod.DELETE, null, Void.class);
+	    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+	
+	@Test
+	void shouldNotAllowDeletionOfIntenrsTheyDoNotOwn() {
+	    ResponseEntity<Void> deleteResponse = restTemplate
+	            .withBasicAuth("Javier", "j")
+	            .exchange("/interns/4", HttpMethod.DELETE, null, Void.class);
+	    assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	    
+	    ResponseEntity<String> getResponse = restTemplate
+	            .withBasicAuth("Rosa", "r")
+	            .getForEntity("/interns/4", String.class);
+	    assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+	
 }
