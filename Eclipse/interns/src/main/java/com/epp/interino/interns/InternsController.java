@@ -42,11 +42,11 @@ public class InternsController {
 	
 	@PostMapping
 	private ResponseEntity<Void> createIntern(@RequestBody Interns newInternRequest, UriComponentsBuilder ucb, Principal principal) {
-		Interns internsWithOwner = new Interns(newInternRequest.id(), newInternRequest.name(), newInternRequest.surname(), newInternRequest.amount(), principal.getName());
+		Interns internsWithOwner = new Interns(newInternRequest.getId(), newInternRequest.getName(), newInternRequest.getSurname(), newInternRequest.getAmount(), principal.getName());
 	    Interns savedIntern = internsRepository.save(internsWithOwner);   
 		URI locationOfNewIntern = ucb
 			.path("interns/{id}")
-			.buildAndExpand(savedIntern.id())
+			.buildAndExpand(savedIntern.getId())
 			.toUri();
 		return ResponseEntity.created(locationOfNewIntern).build();
 	}
@@ -66,7 +66,7 @@ public class InternsController {
 	private ResponseEntity<Void> putIntern(@PathVariable Integer requestedId, @RequestBody Interns internUpdate, Principal principal) {
 		Interns intern = findIntern(requestedId, principal);
 	    if (intern != null) {
-	    	Interns updatedIntern = new Interns(intern.id(), internUpdate.name(), internUpdate.surname(), internUpdate.amount(), principal.getName());
+	    	Interns updatedIntern = new Interns(intern.getId(), internUpdate.getName(), internUpdate.getSurname(), internUpdate.getAmount(), principal.getName());
 	        internsRepository.save(updatedIntern);
 	        return ResponseEntity.noContent().build();
 	    }

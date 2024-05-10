@@ -80,11 +80,11 @@ public class InternsJsonTest {
 	           """;
 	   assertThat(json.parse(expected))
 	           .isEqualTo(new Interns(1000,"Javier", "Lopez", 67.89, "Javier"));
-	   assertThat(json.parseObject(expected).id()).isEqualTo(1000);
-	   assertThat(json.parseObject(expected).name()).isEqualTo("Javier");
-	   assertThat(json.parseObject(expected).surname()).isEqualTo("Lopez");
-	   assertThat(json.parseObject(expected).amount()).isEqualTo(67.89);
-	   assertThat(json.parseObject(expected).boss()).isEqualTo("Javier");
+	   assertThat(json.parseObject(expected).getId()).isEqualTo(1000);
+	   assertThat(json.parseObject(expected).getName()).isEqualTo("Javier");
+	   assertThat(json.parseObject(expected).getSurname()).isEqualTo("Lopez");
+	   assertThat(json.parseObject(expected).getAmount()).isEqualTo(67.89);
+	   assertThat(json.parseObject(expected).getBoss()).isEqualTo("Javier");
 	}
 
 	@Test

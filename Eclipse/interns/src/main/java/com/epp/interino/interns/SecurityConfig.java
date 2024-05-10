@@ -16,14 +16,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		     http
-		             .authorizeHttpRequests(request -> request
-		                     .requestMatchers("/interns/**")
-		                     .hasRole("BOSS"))
-		             .httpBasic(Customizer.withDefaults())
-		             .csrf(csrf -> csrf.disable());
-		     return http.build();
-		}
+		http
+			.authorizeHttpRequests(request -> request
+					.requestMatchers("/interns/**")
+					.hasRole("BOSS"))
+			.httpBasic(Customizer.withDefaults())
+			.csrf(csrf -> csrf.disable());
+		return http.build();
+	}
 
     @Bean
     PasswordEncoder passwordEncoder() {
