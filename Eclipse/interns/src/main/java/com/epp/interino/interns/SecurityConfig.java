@@ -14,17 +14,19 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-			.authorizeHttpRequests(request -> request
-					.requestMatchers("/interns/**")
-					.hasRole("BOSS"))
-			.httpBasic(Customizer.withDefaults())
-			.csrf(csrf -> csrf.disable());
-		return http.build();
+	@Bean SecurityFilterChain filterChain(HttpSecurity http) throws Exception {     
+		http         
+		.authorizeHttpRequests(request -> request             
+				.requestMatchers("/swagger-ui/", "/v3/api-docs/").permitAll()            
+				.requestMatchers("/interns/")
+				.hasRole("BOSS")             
+				.anyRequest().authenticated())    
+		.httpBasic(Customizer.withDefaults())         
+		.csrf(csrf -> csrf.disable());     
+		return http.build(); 
+		
 	}
-
+	
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
