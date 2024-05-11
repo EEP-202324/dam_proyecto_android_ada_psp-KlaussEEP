@@ -15,6 +15,9 @@ public class Interns {
     private double amount;
     private String boss;
 
+    public Interns() {
+    }
+    
     public Interns(Integer id, String name, String surname, double amount, String boss) {
         this.id = id;
         this.name = name;
