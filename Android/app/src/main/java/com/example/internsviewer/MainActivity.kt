@@ -18,10 +18,10 @@ import androidx.compose.ui.text.input.KeyboardType
 @Serializable
 data class Intern(
     val Id: Int,
-    val Name: String,
-    val Surname: String,
-    val amount: Double,
-    val boss: String
+    var Name: String,
+    var Surname: String,
+    var amount: Double,
+    var boss: String
 )
 
 class MainActivity : ComponentActivity() {
@@ -38,7 +38,7 @@ fun InternsList(interns: List<Intern>) {
     Column {
         interns.forEach { intern ->
             Text(
-                text = "ID: ${intern.Id}, Name: ${intern.Name}, Surname: ${intern.Surname}, Amount: ${intern.amount}, Boss: ${intern.boss}",
+                text = "ID: ${intern.Id}, Name: ${intern.Name}, Surname: ${intern.Surname}, Salary: ${intern.amount}, Boss: ${intern.boss}",
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
@@ -53,7 +53,6 @@ fun InternsApp() {
     var showInternsList by remember { mutableStateOf(false) }
     var deleteId by remember { mutableStateOf("") }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
-
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -108,10 +107,20 @@ fun InternsApp() {
                 modifier = Modifier.heightIn(min = 48.dp)
             ) {
                 Button(onClick = {
-                    internsList.add(intern.copy())
+                    val existingIntern = internsList.find { it.Id == intern.Id }
+                    if (existingIntern != null) {
+                        existingIntern.apply {
+                            Name = intern.Name
+                            Surname = intern.Surname
+                            amount = intern.amount
+                            boss = intern.boss
+                        }
+                    } else {
+                        internsList.add(intern.copy())
+                    }
                     intern = Intern(0, "", "", 0.0, "")
                 }) {
-                    Text("Create")
+                    Text("Create / Update")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = {
