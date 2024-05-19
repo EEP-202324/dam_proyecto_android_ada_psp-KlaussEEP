@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -13,16 +13,50 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
-
+const val URL = "http://10.0.2.2:8080/"
 @Serializable
 data class Intern(
-    val Id: Int,
-    var Name: String,
-    var Surname: String,
+    val id: Int,
+    var name: String,
+    var surname: String,
     var amount: Double,
     var boss: String
 )
+
+interface InternApiService {
+    @GET("interns")
+    fun getInterns(): Call<List<Intern>>
+
+    @POST("interns")
+    fun createIntern(@Body intern: Intern): Call<Void>
+
+    @DELETE("interns/{id}")
+    fun deleteIntern(@Path("id") internId: Int): Call<Void>
+}
+
+fun createInternApiService(): InternApiService {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    return retrofit.create(InternApiService::class.java)
+}
+
+object ApiService {
+    val instance: InternApiService by lazy { createInternApiService() }
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +72,8 @@ fun InternsList(interns: List<Intern>) {
     Column {
         interns.forEach { intern ->
             Text(
-                text = "ID: ${intern.Id}, Name: ${intern.Name}, Surname: ${intern.Surname}, Salary: ${intern.amount}, Boss: ${intern.boss}",
-                style = MaterialTheme.typography.body1,
+                text = "ID: ${intern.id}, Name: ${intern.name}, Surname: ${intern.surname}, Salary: ${intern.amount}, Boss: ${intern.boss}",
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }
@@ -54,9 +88,33 @@ fun InternsApp() {
     var deleteId by remember { mutableStateOf("") }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
 
+    fun fetchInterns() {
+        val internApiService = createInternApiService()
+
+        val call = internApiService.getInterns()
+        call.enqueue(object : Callback<List<Intern>> {
+            override fun onResponse(call: Call<List<Intern>>, response: retrofit2.Response<List<Intern>>) {
+                if (response.isSuccessful) {
+                    val interns = response.body()
+                    internsList.clear()
+                    interns?.let {
+                        internsList.addAll(it)
+                    }
+                    showInternsList = true
+                } else {
+                    // Handle error
+                }
+            }
+
+            override fun onFailure(call: Call<List<Intern>>, t: Throwable) {
+                // Handle failure
+            }
+        })
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -67,26 +125,26 @@ fun InternsApp() {
         ) {
             Text(
                 text = "InternsViewer",
-                style = MaterialTheme.typography.h4,
+                style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
-                value = intern.Id.toString(),
-                onValueChange = { intern = intern.copy(Id = it.toIntOrNull() ?: 0) },
+                value = intern.id.toString(),
+                onValueChange = { intern = intern.copy(id = it.toIntOrNull() ?: 0) },
                 label = { Text("ID") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
-                value = intern.Name,
-                onValueChange = { intern = intern.copy(Name = it) },
+                value = intern.name,
+                onValueChange = { intern = intern.copy(name = it) },
                 label = { Text("Name") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
-                value = intern.Surname,
-                onValueChange = { intern = intern.copy(Surname = it) },
+                value = intern.surname,
+                onValueChange = { intern = intern.copy(surname = it) },
                 label = { Text("Surname") }
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -107,23 +165,26 @@ fun InternsApp() {
                 modifier = Modifier.heightIn(min = 48.dp)
             ) {
                 Button(onClick = {
-                    val existingIntern = internsList.find { it.Id == intern.Id }
-                    if (existingIntern != null) {
-                        existingIntern.apply {
-                            Name = intern.Name
-                            Surname = intern.Surname
-                            amount = intern.amount
-                            boss = intern.boss
+                    val newIntern = Intern(0, "Nuevo Intern", "Posición", 0.0, "Otra información")
+                    ApiService.instance.createIntern(newIntern).enqueue(object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                            if (response.isSuccessful) {
+                                // La creación fue exitosa, puedes realizar alguna acción aquí si es necesario
+                            } else {
+                                // La solicitud no fue exitosa, manejar el error aquí
+                            }
                         }
-                    } else {
-                        internsList.add(intern.copy())
-                    }
-                    intern = Intern(0, "", "", 0.0, "")
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            // Error de red u otro error ocurrió, manejarlo aquí
+                        }
+                    })
                 }) {
-                    Text("Create / Update")
+                    Text("Create")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = {
+                    fetchInterns()
                     showInternsList = true
                 }) {
                     Text("View all")
@@ -169,7 +230,7 @@ fun InternsApp() {
                 Button(onClick = {
                     val idToDelete = deleteId.toIntOrNull()
                     if (idToDelete != null) {
-                        internsList.removeAll { it.Id == idToDelete }
+                        ApiService.instance.deleteIntern(idToDelete)
                         deleteId = ""
                         isDeleteDialogOpen = false
                     }
