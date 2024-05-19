@@ -78,7 +78,7 @@ public class InternsController {
 	}
 	
 	@DeleteMapping("/{id}")
-	private ResponseEntity<Void> deleteCashCard(@PathVariable Integer id,  Principal principal) {
+	private ResponseEntity<Void> deleteIntern(@PathVariable Integer id,  Principal principal) {
 		if (internsRepository.existsByIdAndBoss(id, principal.getName())) {
 			internsRepository.deleteById(id);
 			return ResponseEntity.noContent().build(); 

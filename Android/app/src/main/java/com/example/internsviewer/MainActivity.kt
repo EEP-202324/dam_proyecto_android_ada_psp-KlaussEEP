@@ -24,7 +24,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-const val URL = "http://10.0.2.2:8080/"
 @Serializable
 data class Intern(
     val id: Int,
@@ -93,7 +92,7 @@ fun InternsApp() {
 
         val call = internApiService.getInterns()
         call.enqueue(object : Callback<List<Intern>> {
-            override fun onResponse(call: Call<List<Intern>>, response: retrofit2.Response<List<Intern>>) {
+            override fun onResponse(call: Call<List<Intern>>, response: Response<List<Intern>>) {
                 if (response.isSuccessful) {
                     val interns = response.body()
                     internsList.clear()
@@ -130,13 +129,6 @@ fun InternsApp() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
-                value = intern.id.toString(),
-                onValueChange = { intern = intern.copy(id = it.toIntOrNull() ?: 0) },
-                label = { Text("ID") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TextField(
                 value = intern.name,
                 onValueChange = { intern = intern.copy(name = it) },
                 label = { Text("Name") }
@@ -169,9 +161,9 @@ fun InternsApp() {
                     ApiService.instance.createIntern(newIntern).enqueue(object : Callback<Void> {
                         override fun onResponse(call: Call<Void>, response: Response<Void>) {
                             if (response.isSuccessful) {
-                                // La creación fue exitosa, puedes realizar alguna acción aquí si es necesario
+                                // La creación fue exitosa
                             } else {
-                                // La solicitud no fue exitosa, manejar el error aquí
+                                // La solicitud no fue exitosa
                             }
                         }
 
